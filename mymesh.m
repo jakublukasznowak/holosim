@@ -1,5 +1,5 @@
 
-function c5 = mymesh (a,b)
+function c55 = mymesh (a,b)
 
 Na=size(a,1); Ma=size(a,2);
 Nb=size(b,1); Mb=size(b,2);
@@ -44,7 +44,7 @@ end
 %     end
 % end
 
-c5=reshape(c3(:,1:Nb,:),[Na*Nb,2]);
+c55=reshape(c3(:,1:Nb,:),[Na*Nb,2]);
 
 end
 
