@@ -1,4 +1,4 @@
-
+% zmiana w matlabie
 function c55 = mymesh (a,b)
 
 Na=size(a,1); Ma=size(a,2);
