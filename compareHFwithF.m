@@ -6,10 +6,10 @@ HFpath='/home/pracownicy/jnowak/holo/simulations/databank/stillHuygensFresnel';
 z=65e-3; x=3e-3; y=2e-3; diam=25e-6;
 zR=-69e-3; zh=z+zR;
 ksi=x*abs(z/zR); eta=y*abs(z/zR);
-%HFfile=[sprintf('d%02d_zh%02d_x%02d_y%02d',...
-%        round(diam*1e6),round(abs(zh)*1e3),round(ksi*1e4),round(eta*1e4)),...
-%        '.mat'];
-HFfile='d15_zh24_x20_y13.mat';
+HFfile=[sprintf('d%02d_zh%02d_x%02d_y%02d',...
+        round(diam*1e6),round(abs(zh)*1e3),round(ksi*1e4),round(eta*1e4)),...
+        '.mat'];
+%HFfile='d15_zh24_x20_y13.mat';
 
 load([HFpath,filesep,HFfile])
 
