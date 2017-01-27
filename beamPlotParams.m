@@ -1,7 +1,7 @@
 
 % params
-prefix='27_';
-beamfile='/home/pracownicy/jnowak/holo/beam/beamParams_27.mat';
+prefix='29_';
+beamfile='/home/pracownicy/jnowak/holo/beam/beamParams_29.mat';
 output='/home/pracownicy/jnowak/holo/beam/plots';
 
 
