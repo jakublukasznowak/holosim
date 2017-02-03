@@ -3,8 +3,7 @@
 
 %% parameters
 
-Nworkers=3;
-outputPath='/home/pracownicy/jnowak/holo/simulations/holograms/movF_1';
+outputPath='/home/pracownicy/jnowak/holo/simulations/movF2/holograms';
 
 beamNoise=0.02;
 cameraNoise=1;
@@ -29,7 +28,7 @@ d=(5:5:25)'*1e-6;
 
 v=(0:5:30)'*1e-3;
 %v=[0 10 20 30]'*1e-3;
-phi=[0 pi/4 pi 3/4*pi]';
+phi=[0 pi/4 pi/2 3/4*pi]';
 theta=0;
 
 
@@ -60,17 +59,22 @@ Nxy=size(xy,1); Ndrop=size(pos,1);
 Nholo=ceil(Ndrop/4/Nxy);
 NE=Nholo*4*Nxy;
 posExy=[pos(:,1:2); nan(NE-Ndrop,2)];
+velExy=[vel(:,2:3); nan(NE-Ndrop,2)];
 
 rotM=cat(3,[1 0; 0 1],[0 -1; 1 0],[-1 0; 0 -1],[0 1; -1 0]);
 posExy=reshape(posExy',[2 Nxy NE/Nxy]);
+velExy=reshape(velExy',[2 Nxy NE/Nxy]);
 for i=1:NE/Nxy/4
     for j=1:4
         posExy(:,:,(i-1)*4+j)=rotM(:,:,j)*posExy(:,:,(i-1)*4+j);
+        velExy(:,:,(i-1)*4+j)=rotM(:,:,j)*velExy(:,:,(i-1)*4+j);
     end
 end
 posExy=reshape(posExy,[2 NE])';
+velExy=reshape(velExy,[2 NE])';
 
 pos(:,1:2)=posExy(1:Ndrop,:);
+vel(:,2:3)=velExy(1:Ndrop,:);
 
 
 % scale horizontal distance and shift order to (z,x,y)
@@ -111,8 +115,24 @@ for i=1:Nholo
         holoparams(i).method);
     makeHologram(I,IR,holoparams(i).beamNoiseLevel,holoparams(i).cameraNoiseLevel,...
         [outputPath,filesep,sprintf('holo%04d',i)],[]);
+    
+    makeHologram(IR,IR,holoparams(i).beamNoiseLevel,holoparams(i).cameraNoiseLevel,...
+        [outputPath,filesep,sprintf('holo%04d_bg1',i)],[]);
+    makeHologram(IR,IR,holoparams(i).beamNoiseLevel,holoparams(i).cameraNoiseLevel,...
+        [outputPath,filesep,sprintf('holo%04d_bg2',i)],[]);
+    makeHologram(IR,IR,holoparams(i).beamNoiseLevel,holoparams(i).cameraNoiseLevel,...
+        [outputPath,filesep,sprintf('holo%04d_bg3',i)],[]);
+    
     fprintf('Hologram %d out of %d done.\n\n',i,Nholo)
     uS=etd(uS,i);
 end
+
+makeHologram(IR,IR,holoparams(i).beamNoiseLevel,holoparams(i).cameraNoiseLevel,...
+    [outputPath,filesep,sprintf('holo%04d_bg1',0)],[]);
+makeHologram(IR,IR,holoparams(i).beamNoiseLevel,holoparams(i).cameraNoiseLevel,...
+    [outputPath,filesep,sprintf('holo%04d_bg2',0)],[]);
+makeHologram(IR,IR,holoparams(i).beamNoiseLevel,holoparams(i).cameraNoiseLevel,...
+    [outputPath,filesep,sprintf('holo%04d_bg3',0)],[]);
+
 
 save([outputPath,filesep,'holoparams.mat'],'holoparams')

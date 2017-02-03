@@ -18,18 +18,17 @@ yR=0.8615e-3; yC=-sign(yR)*3.25e-3;
 rmax=sqrt((xR-xC)^2+(yR-yC)^2);
 
 
-
 %% 1st, 2nd and approx 3rd limit
 z=(25:0.1:65)'*1e-3; zo=zR-z;
 r=(0.2:0.2:0.8)'*Dh/2; % distance from the hologram center in hologram plane
 
-dlim1=1.22*2*lambda*zo/Dh;
+dlim1=1.22*2*lambda/Dh*zo;
 
 [Z,R]=meshgrid(zo,r);
 dlim2=1.22*2*lambda/Dh*Z./(1-2/Dh*R);
 
-betaG=10;
-dlim3_approx=betaG/pi*2*lambda/Dh*zo;
+%betaG=10;
+%dlim3_approx=betaG/pi*2*lambda/Dh*zo;
 
 f=figure('Color','white',...
     'PaperUnits','centimeters',...
@@ -40,14 +39,13 @@ ax=axes('Parent',f,'Color','none',...
 hold on
 plot(z*1e3,dlim1*1e6)
 plot(z*1e3,dlim2*1e6)
-plot(z*1e3,dlim3_approx*1e6)
+%plot(z*1e3,dlim3_approx*1e6)
 legend(cat(1,'Rayleigh',...
-    num2cell(num2str(r*1e3,'r=%4.2f mm'),2),...
-    'aperture approx'),...
+    num2cell(num2str(r*1e3,'r_o=%4.2f mm'),2)),...
     'Location','northeast')
 xlabel('z [mm]')
 ylabel('Resolution [\mum]')
-title('Resolution limits 1-3')
+title('Aperture resolution limits')
 set(ax,'XGrid','on','YGrid','on','GridAlpha',0.5,'XLim',[min(z) max(z)]*1e3)
 print(f,[output,filesep,'res1-3'],['-d',frm],['-r',num2str(res)]);
 
@@ -80,7 +78,7 @@ hold on
 plot(z*1e3,nlim4)
 xlabel('z [mm]')
 ylabel('Number of resolved fringes')
-title('Resolution limit 4a')
+title('Fringes resolvability')
 set(ax,'XGrid','on','YGrid','on','GridAlpha',0.5,'XLim',[min(z) max(z)]*1e3)
 print(f,[output,filesep,'res4a'],['-d',frm],['-r',num2str(res)]);
 
@@ -107,8 +105,8 @@ hold on
 contourf(z*1e3,k,dlim4*1e6,30)
 colormap jet, c=colorbar; c.Label.String='Resolution [\mum]';
 xlabel('z [mm]')
-ylabel('bessel normalized coordinate k')
-title('Resolution limit 4b')
+ylabel('Bessel normalized coordinate \kappa')
+title('Fringe frequency resolution limit')
 print(f,[output,filesep,'res4bCon'],['-d',frm],['-r',num2str(res)]);
 
 [Zo,K]=meshgrid(zo,k);
@@ -124,8 +122,8 @@ hold on
 contourf(z*1e3,k,dlim4_approx*1e6,30)
 colormap jet, c=colorbar; c.Label.String='Resolution [\mum]';
 xlabel('z [mm]')
-ylabel('bessel normalized coordinate k')
-title('Resolution limit 4b approx')
+ylabel('Bessel normalized coordinate \kappa')
+title('Fringe frequency resolution limit approx')
 print(f,[output,filesep,'res4bConAp'],['-d',frm],['-r',num2str(res)]);
 
 
@@ -137,13 +135,13 @@ ax=axes('Parent',f,'Color','none',...
     'Position',[0.1 0.1 0.85 0.82],'FontSize',8);
 hold on
 plot(z*1e3,dlim4(1:10:end,:)'*1e6)
-legend(num2str(k(1:10:end),'k=%4.2f\n'),'Location','northwest')
-plot(z*1e3,dlim4_approx(1:10:end,:)'*1e6,'r--')
-plot(z*1e3,dlim4(1:10:end,:)'*1e6)
+legend([repmat('\kappa=',length(1:10:length(k)),1),num2str(k(1:10:end),'%4.2f\n')],'Location','northwest')
+%plot(z*1e3,dlim4_approx(1:10:end,:)'*1e6,'r--')
+%plot(z*1e3,dlim4(1:10:end,:)'*1e6)
 %legend(num2str(k(1:10:end),'k=%4.2f\n'))
 xlabel('z [mm]')
 ylabel('Resolution [\mum]')
-title('Resolution limit 4b')
+title('Fringe frequency resolution limit')
 set(ax,'XGrid','on','YGrid','on','GridAlpha',0.5,'XLim',[min(z) max(z)]*1e3)
 print(f,[output,filesep,'res4bLin'],['-d',frm],['-r',num2str(res)]);
 
@@ -154,7 +152,7 @@ print(f,[output,filesep,'res4bLin'],['-d',frm],['-r',num2str(res)]);
 % parmeters grid
 z=(25:0.5:65)'*1e-3; zo=zR-z;
 r=(0:1e-4:rmax)'; % distance from the beam center in hologram plane
-n=(1:10)'; % number of fringes to be resolved
+n=(1:15)'; % number of fringes to be resolved
 k=(0.25:0.05:1)'; % length with respect to 1st bessel zero
 
 %% d=d(r,zo,n)
@@ -191,8 +189,8 @@ for cnt1=1:length(n)
     %caxis([min(dlim5a(:)) max(dlim5a(:))]*1e6)
     colormap jet, c=colorbar; c.Label.String='Resolution [\mum]';
     xlabel('z [mm]')
-    ylabel('r [mm]')
-    title(sprintf('Resolution limit 5a for resolved fringes n=%d',round(n(cnt1))))
+    ylabel('r_o [mm]')
+    title(sprintf('Fringe contrast resolution limit for n=%d',round(n(cnt1))))
     print(f,[output,filesep,sprintf('res5a_n%03d',round(n(cnt1)))],['-d',frm],['-r',num2str(res)]);
 end
 
@@ -213,8 +211,8 @@ for cnt1=1:length(n)
     %caxis([min(dlim5a(:)) max(dlim5a(:))]*1e6)
     colormap jet, c=colorbar; c.Label.String='Resolution [\mum]';
     xlabel('z [mm]')
-    ylabel('r [mm]')
-    title(sprintf('Resolution limit 5a approx for resolved fringes n=%d',round(n(cnt1))))
+    ylabel('r_o [mm]')
+    title(sprintf('Fringe contrast resolution limit n=%d',round(n(cnt1))))
     print(f,[output,filesep,sprintf('res5aAp_n%03d',round(n(cnt1)))],['-d',frm],['-r',num2str(res)]);
 end
 
@@ -256,8 +254,8 @@ for cnt1=1:length(k)
     %caxis([min(dlim5a(:)) max(dlim5a(:))]*1e6)
     colormap jet, c=colorbar; c.Label.String='Resolution [\mum]';
     xlabel('z [mm]')
-    ylabel('r [mm]')
-    title(sprintf('Resolution limit 5b for bessel coordinate k=%4.2f',k(cnt1)))
+    ylabel('r_o [mm]')
+    title(['Fringe contrast resolution limit for \kappa=',num2str(k(cnt1),'%4.2f')])
     print(f,[output,filesep,sprintf('res5b_k%03d',round(k(cnt1)*100))],['-d',frm],['-r',num2str(res)]); 
 end
 
@@ -278,7 +276,7 @@ for cnt1=1:length(k)
     %caxis([min(dlim5a(:)) max(dlim5a(:))]*1e6)
     colormap jet, c=colorbar; c.Label.String='Resolution [\mum]';
     xlabel('z [mm]')
-    ylabel('r [mm]')
-    title(sprintf('Resolution limit 5b for bessel coordinate k=%4.2f',k(cnt1)))
+    ylabel('r_o [mm]')
+    title(['Fringe contrast resolution limit for \kappa=',num2str(k(cnt1),'%4.2f')])
     print(f,[output,filesep,sprintf('res5bAp_k%03d',round(k(cnt1)*100))],['-d',frm],['-r',num2str(res)]); 
 end
