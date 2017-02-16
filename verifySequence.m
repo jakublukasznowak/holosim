@@ -1,18 +1,21 @@
 
-function [SIM,MESpaired,MESfalse] = verifySequence (holoparams,mfile,classification,output,plotpath)
-
-maxDist=0.2e-3;
+function [SIM,MESpaired,MESfalse] = verifySequence (maxDist,holoparams,mfile,classification,output,plotpath)
 
 if ischar(mfile), mfile=load(mfile); end
 if ischar(holoparams), load(holoparams); end
-if nargin<3 || isempty(classification), classification=mfile.classification; end
-if nargin<4, output=''; end
-if nargin<5 || isempty(plotpath), ifplot=false; else ifplot=true; end
+if nargin<4 || isempty(classification), classification=mfile.classification; end
+if nargin<5, output=''; end
+if nargin<6 || isempty(plotpath), ifplot=false; else ifplot=true; end
 
 nubblyInd=find(classification(:,2)=='Particle_nubbly');
 holonum=mfile.holonum(nubblyInd);
 metrics=mfile.metrics(nubblyInd,:);
 metricsNames=mfile.metricsNames;
+Nmet=size(metrics,2);
+traces=mfile.traces(nubblyInd,:);
+tracesNames=mfile.tracesNames;
+Ntr=size(traces,2);
+clear mfile
 
 
 inmetrNames={'zpos','xpos','ypos','minsiz','majsiz','orient'};
@@ -62,17 +65,33 @@ for n=1:Nh
    us=etd(us,n);
 end
 
-MESpaired.indAll=zeros(size((MESpaired.indNubbly)));
-MESpaired.indAll(MESpaired.indNubbly>0)=nubblyInd(MESpaired.indNubbly(MESpaired.indNubbly>0));
+nzsim=(SIM.indNubbly>0);
+Lsim=length(SIM.indNubbly);
+SIM.indAll=zeros(Lsim,1);
+SIM.indAll(nzsim)=nubblyInd(SIM.indNubbly(nzsim));
+if all(SIM.pos(:,1)<0)
+    SIM.pos(:,1)=-SIM.pos(:,1);
+end
+
+nzpaired=(MESpaired.indNubbly>0);
+Lpaired=length(MESpaired.indNubbly);
+MESpaired.indAll=zeros(Lpaired,1);
+MESpaired.indAll(nzpaired)=nubblyInd(MESpaired.indNubbly(nzpaired));
+
+MESpaired.metrics=zeros(Lpaired,Nmet);
+MESpaired.metrics(nzpaired,:)=metrics(MESpaired.indNubbly(nzpaired),:);
+MESpaired.traces=cell(Lpaired,Ntr);
+MESpaired.traces(nzpaired,:)=traces(MESpaired.indNubbly(nzpaired),:);
+
 
 MESfalse.indAll=nubblyInd(MESfalse.indNubbly);
+MESfalse.metrics=metrics(MESfalse.indNubbly,:);
+MESfalse.traces=traces(MESfalse.indNubbly,:);
 
 
 if ~isempty(output)
-    traces=mfile.traces(nubblyInd,:);
-    tracesNames=mfile.tracesNames;
-    save(output,'SIM','MESpaired','MESfalse',...
-        'metrics','metricsNames','traces','tracesNames','nubblyInd')
+    save(output,'SIM','MESpaired','MESfalse','maxDist',...
+        'metricsNames','tracesNames','nubblyInd')
 end
 
 end
